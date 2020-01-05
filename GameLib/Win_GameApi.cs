@@ -6,7 +6,7 @@ using GameLib.Core;
 using GameLib.Models;
 using GameLib;
 using GameLib.Enums;
-
+using GameLib.Interaction;
 namespace GameLib
 {
     public class Win_GameApi : IGameApi
@@ -122,17 +122,11 @@ namespace GameLib
             core.Level = Level;
             if (Settings == null) Settings = new Settings();
             core.initForm(formName);
-            core.mainRenderForm.FormClosed += MainRenderForm_FormClosed;
             core.Debug = GenLvl;
             core.InitObjects();
             Console.WriteLine($"Матрица уровня {core.MatrWidth}x{core.MatrHeight}");
             core.InitBinds();
             core.ShowForm();
-        }
-
-        private void MainRenderForm_FormClosed(object sender, System.Windows.Forms.FormClosedEventArgs e)
-        {
-            Exit();
         }
     }
 }

@@ -1,15 +1,17 @@
-﻿using GameLib;
+﻿using GameLib.Interaction;
+using GameLib;
 using GameLib.Core;
 using GameLib.Enums;
 using GameLib.Models;
 using GameLib.Transform;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
 namespace Game
 {
-    public sealed partial class My2dGame : WinCore 
+    public sealed partial class My2dGame : WinCore, IObserverable
     {
         /*
          0000000000000000000
@@ -19,6 +21,7 @@ namespace Game
         private int floorPosY;
         private StatusGame statusGame;
         private ObjConstructorTag objConstructorTag;
+        private List<IObserver> observers;
 
         #region DEBUG
         Size oSize = new Size(128, 128);
@@ -39,87 +42,29 @@ namespace Game
 
         public My2dGame()
         {
+            EndGame = false;
+            observers = new List<IObserver>();
         }
 
 
-        /// <summary>
-        /// Добавление объектов на сцену
-        /// </summary>
-        public override void InitObjects()
+        
+
+       
+
+        private void OnMenuPauseClick(object sender, EventArgs e)
         {
-            // set camera
-            RenderTarget.Transform = cam2d.GetTransform3x2();
-            camStartPos = new SharpDX.Vector2(0, 0);
-            camNewPos = new SharpDX.Vector2(0, 0);
-            camMove = new SharpDX.Vector2(0, 0);
+            Pause();
+        }
 
-            // set UI
-            if (userinterface == null) userinterface = new UI(RenderTarget, cam2d);
-
-            if (Debug)
-            {
-                statusGame = StatusGame.Debug;
-                objConstructorTag = ObjConstructorTag.Barrier;
-                // set floor
-                floorPosY = mainRenderForm.Height - 200;
-                for (int i = floorPosY; i < MatrHeight; i++)
-                {
-                    for (int j = 0; j < MatrWidth; j++)
-                    {
-                        mapMatrix[i, j] = 1;
-                    }
-                }
-                player1 = new GameObject("player 1");
-                player1.objectTag = Tag.CONTROLLEDHERO;
-                floor = new Barrier();
-                background = new Barrier();
-
-                floor.Collider = new SharpDX.Mathematics.Interop.RawRectangleF(0, mainRenderForm.Height - 200, mainRenderForm.Width * 2, mainRenderForm.Height);
-                floor.texturePath = Strings.TexturePath + "floor.jpg";
-                floor.SetTexture(RenderTarget);
-                floor.objectTag = Tag.ENVIRONMENT;
-
-                background.Collider = new SharpDX.Mathematics.Interop.RawRectangleF(0, 0, mainRenderForm.Width * 2, mainRenderForm.Height-200);
-                background.texturePath = Strings.TexturePath + "back.jpg";
-                background.SetTexture(RenderTarget);
-                background.objectTag = Tag.ENVIRONMENT;
-
-                player1.texturePath = Strings.TexturePath + "texture1.png";
-                player1.Move(new GameLib.Transform.Vector2(200, -200));
-                player1.SetTexture(RenderTarget);
-
-                Level.BackGround = background;
-                Level.Floor = floor;
-                Level.ObjectsOnScene.Add(player1);
-
-                controlledHero = player1;
-            }
-            else 
-            {
-                statusGame = StatusGame.Release;
-                foreach (var obj in Level.ObjectsOnScene)
-                {
-                    obj.SetTexture(RenderTarget);
-                    if (obj.objectTag == Tag.CONTROLLEDHERO) controlledHero = obj;
-                   // Console.WriteLine(obj.Collider.Right);
-                }
-                if (controlledHero == null)
-                {
-                    controlledHero = new GameObject();
-                    controlledHero.texturePath = Strings.TexturePath + "texture1.png";
-                    controlledHero.Move(new GameLib.Transform.Vector2(200, -200));
-                    controlledHero.SetTexture(RenderTarget);
-                }
-                controlledHero.animationController = new AnimationController(Strings.AnimationControllerPath + "Hero/", controlledHero, RenderTarget);
-                controlledHero.animationController.AnimIdle_Run();
-
-                foreach (var obj in Level.WallsOnScene) 
-                {
-                    obj.SetTexture(RenderTarget);
-                }
-                Level.Floor.SetTexture(RenderTarget);
-                Level.BackGround.SetTexture(RenderTarget);
-            }
+        private void OnMenuExitClick(object sender, EventArgs e)
+        {
+            EndGame = true;
+            Notify(1);
+            mainRenderForm.Close();
+        }
+        private void OnMenuSaveClick(object sender, EventArgs e)
+        {
+            Notify(2);
         }
 
         public override void InitBinds()
@@ -132,6 +77,7 @@ namespace Game
             else if (statusGame == StatusGame.Release) 
             {
                 mainRenderForm.KeyDown += MainRenderForm_KeyDown_release;
+                mainRenderForm.KeyUp += MainRenderForm_KeyUp_release;
                 mainRenderForm.MouseClick += MainRenderForm_MouseClick_Release; 
             }
             mainRenderForm.MouseMove += MainRenderForm_MouseMove;
@@ -192,6 +138,7 @@ namespace Game
             {
                 RenderTarget.DrawBitmap(obj.Texture, obj.Collider, 1, SharpDX.Direct2D1.BitmapInterpolationMode.NearestNeighbor);
             }
+            
             if (statusGame == StatusGame.Debug && GetStartPos == true)
             {
                 RenderTarget.DrawRectangle(userinterface.BuildRect, userinterface.blackBrush);
@@ -211,6 +158,24 @@ namespace Game
             }
             gameClock.Restart();
             #endregion
+        }
+
+        public void AddObserver(IObserver observer)
+        {
+            observers.Add(observer);
+        }
+
+        public void RemoveObserver(IObserver observer)
+        {
+            observers.Remove(observer);
+        }
+
+        public void Notify(int status)
+        {
+            foreach (var observer in observers) 
+            {
+                observer.Action(status);
+            }
         }
     }
 }

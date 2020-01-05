@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="My2dGame.cs" />
     <Compile Include="My2dGame_Debug.cs" />
+    <Compile Include="My2dGame_InitObj.cs" />
     <Compile Include="My2dGame_Release.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -98,8 +99,6 @@
       <DependentUpon>wform.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="bin\Debug\Res\formback.jpg" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -33,6 +33,7 @@ namespace GameLib.Core
         public Level Level;
         public UI userinterface;
         public bool Debug = true;
+        public bool EndGame;
 
         public bool OnRealMatrix = false;
         public string MatrixPath;
@@ -56,6 +57,7 @@ namespace GameLib.Core
             mainRenderForm = new RenderForm(formtitle);
 
             Factory = new SharpDX.Direct2D1.Factory(SharpDX.Direct2D1.FactoryType.SingleThreaded);
+            mainRenderForm.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
 
             mainRenderForm.Width = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width;
             mainRenderForm.Height = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height;

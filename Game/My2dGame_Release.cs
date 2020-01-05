@@ -41,7 +41,7 @@ namespace Game
                     break;
                 case System.Windows.Forms.Keys.Right:
                     if (controlledHero.Collider.Right + controlledHero.Speed >= MatrWidth) break;
-                    for (int i = (int)controlledHero.Collider.Top + 10; i < (int)controlledHero.Collider.Bottom; i++)
+                    for (int i = (int)controlledHero.Collider.Top; i < (int)controlledHero.Collider.Bottom; i++)
                     { 
                         if (mapMatrix[i, (int)(controlledHero.Collider.Right + controlledHero.Speed)] == 1) 
                         {
@@ -52,13 +52,21 @@ namespace Game
                     if (free) 
                     {
                         Right.X = controlledHero.Speed;
-                        Right.Y = 0;
+                        if (!controlledHero.animationController.CurrentAnimName.Contains("Run"))
+                        {
+                            controlledHero.animationController.AnimationRun("Run_R", true, 200);
+                            Right.X = controlledHero.Speed * 5;
+                        }
+                        else 
+                        {
+                            Right.X = controlledHero.Speed;
+                        }
                         controlledHero.Move(Right); 
                     }
                     break;
                 case System.Windows.Forms.Keys.Left:
                     if (controlledHero.Collider.Left - controlledHero.Speed <= 0) break;
-                    for (int i = (int)controlledHero.Collider.Top + 10; i < (int)controlledHero.Collider.Bottom; i++)
+                    for (int i = (int)controlledHero.Collider.Top; i < (int)controlledHero.Collider.Bottom; i++)
                     {
                         if (mapMatrix[i, (int)(controlledHero.Collider.Left - controlledHero.Speed)] == 1)
                         {
@@ -68,11 +76,25 @@ namespace Game
                     }
                     if (free)
                     {
-                        Left.X = -controlledHero.Speed;
-                        Left.Y = 0;
+                        if (!controlledHero.animationController.CurrentAnimName.Contains("Run"))
+                        {
+                            controlledHero.animationController.AnimationRun("Run_L", true, 200);
+                            Left.X = -controlledHero.Speed * 5;
+                        }
+                        else 
+                        {
+                            Left.X = -controlledHero.Speed;
+                        }
                         controlledHero.Move(Left);
                     }
                     break;
+            }
+        }
+        private void MainRenderForm_KeyUp_release(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (controlledHero.animationController.CurrentAnimName.Contains("Run")) 
+            {
+                controlledHero.animationController.AnimationRun("Idle", true, 200);
             }
         }
     }

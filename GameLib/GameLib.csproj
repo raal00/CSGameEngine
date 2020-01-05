@@ -74,6 +74,8 @@
     <Compile Include="Enums\StatusTag.cs" />
     <Compile Include="Enums\Tag.cs" />
     <Compile Include="IGameApi.cs" />
+    <Compile Include="Interaction\IObserver.cs" />
+    <Compile Include="Interaction\IObserverable.cs" />
     <Compile Include="LevelMatrixIO.cs" />
     <Compile Include="Models\Animation.cs" />
     <Compile Include="Models\AnimationController.cs" />

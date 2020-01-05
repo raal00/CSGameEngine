@@ -6,8 +6,8 @@
       <deep>0</deep>
       <Opacity>1</Opacity>
       <position>
-        <X>40</X>
-        <Y>779</Y>
+        <X>200</X>
+        <Y>658</Y>
       </position>
       <OnGround>true</OnGround>
       <Speed>5</Speed>
@@ -17,10 +17,10 @@
       <objectTag>CONTROLLEDHERO</objectTag>
       <texturePath>Res/Graphics/Texture/texture1.png</texturePath>
       <Collider>
-        <Left>40</Left>
-        <Top>779</Top>
-        <Right>140</Right>
-        <Bottom>879</Bottom>
+        <Left>200</Left>
+        <Top>658</Top>
+        <Right>300</Right>
+        <Bottom>758</Bottom>
       </Collider>
     </GameObject>
   </GameObjectList>

@@ -7,8 +7,6 @@ D:\Программирование\backend\C#\forms\Game\Game\bin\Debug\SharpDX
 D:\Программирование\backend\C#\forms\Game\Game\bin\Debug\SharpDX.DXGI.dll
 D:\Программирование\backend\C#\forms\Game\Game\bin\Debug\SharpDX.Mathematics.dll
 D:\Программирование\backend\C#\forms\Game\Game\bin\Debug\GameLib.pdb
-D:\Программирование\backend\C#\forms\Game\Game\bin\Debug\SharpDX.Desktop.pdb
-D:\Программирование\backend\C#\forms\Game\Game\bin\Debug\SharpDX.Desktop.xml
 D:\Программирование\backend\C#\forms\Game\Game\bin\Debug\SharpDX.Direct2D1.pdb
 D:\Программирование\backend\C#\forms\Game\Game\bin\Debug\SharpDX.Direct2D1.xml
 D:\Программирование\backend\C#\forms\Game\Game\bin\Debug\SharpDX.pdb

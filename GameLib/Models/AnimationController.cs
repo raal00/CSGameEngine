@@ -8,10 +8,11 @@ namespace GameLib.Models
 {
     public class AnimationController
     {
-        private readonly GameObject target;
 
         private Animation[] anims;
         private int animsCount;
+
+        public string CurrentAnimName = null;
 
         public AnimationController(string controllerPath, GameObject target, WindowRenderTarget renderTarget) 
         {
@@ -23,16 +24,23 @@ namespace GameLib.Models
             {
                 anims[i] = new Animation(controllerPath+"/"+ animDirs[i].Name+"/", animDirs[i].Name, target, renderTarget);
             }
+            AnimationRun("Idle", true, 200);
         }
-        public async void AnimRun_Run() 
+
+        public async void AnimationRun(string name, bool loop, int changeTime) 
         {
-            Animation a = anims.Where(x => x.AnimName == "Run").FirstOrDefault();
-            if (a != null) await a.PlayAsync(200);
+            AnimationStop();
+            Animation a = anims.Where(x => x.AnimName == name).FirstOrDefault();
+            if (a != null) 
+            {
+                CurrentAnimName = name;
+                a.Loop = loop;
+                await a.PlayAsync(changeTime); 
+            }
         }
-        public async void AnimIdle_Run() 
+        public void AnimationStop() 
         {
-            Animation a = anims.Where(x => x.AnimName == "Idle").FirstOrDefault();
-            if (a != null) await a.PlayAsync(200);
+            if (CurrentAnimName != null) anims.Where(x => x.AnimName == CurrentAnimName).FirstOrDefault().Loop = false;
         }
     }
 }

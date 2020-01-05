@@ -1,7 +1,4 @@
-﻿using GameLib.Transform;
-using System.Collections.Generic;
-
-namespace Game
+﻿namespace Game
 {
     class Program
     {
@@ -9,6 +6,8 @@ namespace Game
         {
             wform form = new wform();
             form.ShowDialog();
+            System.Console.WriteLine("Завершение программы");
+            System.Console.ReadKey();
         }
     }
 }

@@ -14,10 +14,11 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DXGI;
 using GameLib.Enums;
+using GameLib.Interaction;
 
 namespace Game
 {
-    public partial class wform : Form
+    public partial class wform : Form, IObserver
     {
         LoadTag tag_load;
         GameLib.Win_GameApi launcher;
@@ -38,6 +39,7 @@ namespace Game
 
             launcher = new GameLib.Win_GameApi();
             my2D = new My2dGame();
+            my2D.AddObserver(this);
             settings = new Settings();
             
             launcher.core = my2D;
@@ -93,6 +95,24 @@ namespace Game
             SetLevel.Enabled = false;
             launcher.GenerateLevel((int)LevelID.Value);
             this.Close();
+        }
+
+        public void Action(int status)
+        {
+            switch (status) 
+            {
+                case 1: 
+                    {
+                        this.Close();
+                        break;
+                    }
+                case 2: 
+                    {
+                        SaveBtn_Click(null, null);
+                        MessageBox.Show($"Текущая игра сохранена в файл {LevelID_2.Value}.xml");
+                        break;
+                    }
+            }
         }
     }
 }
