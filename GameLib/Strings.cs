@@ -5,6 +5,7 @@ namespace GameLib
     public static class Strings
     {
         public static readonly string TexturePath = "Res/Graphics/Texture/";
+        public static readonly string BuildWallsPath = "Res/Graphics/Texture/build/";
         public static readonly string AnimationControllerPath = "Res/Graphics/AController/";
         public static readonly string MusicPath = "Res/Audio/Music/";
         public static readonly string SoundPath = "Res/Audio/Sound/";

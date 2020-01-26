@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using SharpDX.Direct2D1;
 
 namespace Game
 {
@@ -18,24 +19,26 @@ namespace Game
          0000011110000000000
          1111111111111100011    
              */
-        private int floorPosY;
         private StatusGame statusGame;
         private ObjConstructorTag objConstructorTag;
         private List<IObserver> observers;
 
         #region DEBUG
         Size oSize = new Size(128, 128);
+        Bitmap[] buildTextures;
+        string[] buildTextures_Names;
+        int numberOfWallTexture = 0;
+   
         GameObject player1;
-        Barrier floor;
         Barrier background;
+        bool breakable = false;
+        bool hideOnApproach = false;
+        bool hasPhisCollider = true;
+        string BuildParamString;
         #endregion
 
-        Vector2 Jump = new Vector2(0, 50);
-        Vector2 Right = new Vector2(20, 0);
-        Vector2 Left = new Vector2(-20, 0);
+        Vector2 Move = new Vector2(0,0);
 
-        SharpDX.Vector2 camStartPos;
-        SharpDX.Vector2 camNewPos;
         SharpDX.Vector2 camMove;
         GameObject controlledHero;
 
@@ -45,11 +48,6 @@ namespace Game
             EndGame = false;
             observers = new List<IObserver>();
         }
-
-
-        
-
-       
 
         private void OnMenuPauseClick(object sender, EventArgs e)
         {
@@ -73,6 +71,7 @@ namespace Game
             {
                 mainRenderForm.MouseClick += MainRenderForm_MouseClick_Debug;
                 mainRenderForm.KeyDown += MainRenderForm_KeyDown_Debug;
+                mainRenderForm.MouseWheel += MainRenderForm_MouseWheel_Debug;
             }
             else if (statusGame == StatusGame.Release) 
             {
@@ -81,23 +80,32 @@ namespace Game
                 mainRenderForm.MouseClick += MainRenderForm_MouseClick_Release; 
             }
             mainRenderForm.MouseMove += MainRenderForm_MouseMove;
+
+            userinterface.SetUIPos();
+            if (Debug == true) userinterface.SetUIPos_Debug();
+            RenderTarget.Transform = cam2d.GetTransform3x2();
         }
 
         private void MainRenderForm_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (GetStartPos == true) 
             {
-                userinterface.BuildRect.Right = e.Location.X * 2;
-                userinterface.BuildRect.Bottom = e.Location.Y;
+                userinterface.BuildRect.Right = e.Location.X + cam2d.camPos.X;
+                userinterface.BuildRect.Bottom = e.Location.Y + cam2d.camPos.Y;
             }
-            camNewPos.X = e.Location.X;
-            camMove.X = camNewPos.X - camStartPos.X;
-            cam2d.MoveCamera(camMove);
-            userinterface.SetUIPos();
-            RenderTarget.Transform = cam2d.GetTransform3x2();
-            camStartPos = camNewPos;
         }
-
+        void breakWall(Barrier barrier) 
+        {
+            Level.DeleteStatus = true;
+            Level.ForDeleting = barrier;
+            for (int i = (int)barrier.Collider.Top; i < (int)barrier.Collider.Bottom; i++) 
+            {
+                for (int j = (int)barrier.Collider.Left; j < (int)barrier.Collider.Right; j++) 
+                {
+                    mapMatrix[i, j] = 0;
+                }
+            }
+        }
 
 
         /// <summary>
@@ -106,46 +114,55 @@ namespace Game
         /// 
         public override void GameLogic()
         {
-            // draw floor
-            RenderTarget.DrawBitmap(Level.Floor.Texture, Level.Floor.Collider, 1, SharpDX.Direct2D1.BitmapInterpolationMode.NearestNeighbor);
             // draw background
             RenderTarget.DrawBitmap(Level.BackGround.Texture, Level.BackGround.Collider, 1, SharpDX.Direct2D1.BitmapInterpolationMode.NearestNeighbor);
             // draw objects
+            if (Level.DeleteStatus == true && Level.ForDeleting != null) 
+            {
+                switch (Level.ForDeleting.objectTag) 
+                {
+                    case Tag.ENVIRONMENT:
+                        Level.WallsOnScene.Remove((Barrier)Level.ForDeleting);
+                        break;
+                    case Tag.HERO:
+                        Level.ObjectsOnScene.Remove((GameObject)Level.ForDeleting);
+                        break;
+                    default: break;
+                }
+                Level.DeleteStatus = false;
+            }
             foreach (var obj in Level.ObjectsOnScene)
             {
-                if (obj.position.Y + 20 >= MatrHeight) obj.visible = false;
-                else obj.visible = true;
-
-                if (obj.visible &&
-                        (mapMatrix[(int)(obj.Collider.Bottom - obj.phisics.grav.Y), (int)(obj.Collider.Left + 20)] == 0) &&
-                        (mapMatrix[(int)(obj.Collider.Bottom - obj.phisics.grav.Y), (int)(obj.Collider.Right - 20)] == 0))
-                {
-                    obj.OnGround = false;
-                    obj.TicsInTheAir++;
-                    obj.phisics.grav.Y = -2 - obj.TicsInTheAir / 32;
-                    obj.Move(obj.phisics.grav);
-                }
-                else 
-                {
-                    if (obj.TicsInTheAir > 64) Console.WriteLine("SMERT");
-                    obj.TicsInTheAir = 0;
-                    obj.OnGround = true;
-                }
                 if (obj.visible) RenderTarget.DrawBitmap(obj.Texture, obj.Collider, 1, SharpDX.Direct2D1.BitmapInterpolationMode.NearestNeighbor);
             }
             // draw walls
             foreach (var obj in Level.WallsOnScene)
             {
+                if (obj.visible == true)
                 RenderTarget.DrawBitmap(obj.Texture, obj.Collider, 1, SharpDX.Direct2D1.BitmapInterpolationMode.NearestNeighbor);
             }
-            
-            if (statusGame == StatusGame.Debug && GetStartPos == true)
-            {
-                RenderTarget.DrawRectangle(userinterface.BuildRect, userinterface.blackBrush);
-            }
 
+            if (statusGame == StatusGame.Debug)
+            {
+                if (GetStartPos == true)
+                {
+                    RenderTarget.DrawRectangle(userinterface.BuildRect, userinterface.redBrush);
+                }
+                if (buildTextures.Length > 0)
+                {
+                    RenderTarget.DrawBitmap(buildTextures[numberOfWallTexture], userinterface.BuildTextureRect, 1, BitmapInterpolationMode.NearestNeighbor);
+                    if (breakable) BuildParamString = "Разбиваемый";
+                    else BuildParamString = "Не разбиваемый";
+                    if (hideOnApproach) BuildParamString += "\nСкрыть при приближении";
+                    else BuildParamString += "\nНе скрывать";
+                    if (hasPhisCollider) BuildParamString += "\nС физ. оболочкой";
+                    else BuildParamString += "\nБез физ. оболочки";
+                    RenderTarget.DrawText(BuildParamString, userinterface.textFormat, userinterface.BuildParamsRect, userinterface.redBrush);
+                }
+            }
+            
+            RenderTarget.DrawText(userinterface.message, userinterface.textFormat, userinterface.MessageTextBox, userinterface.redBrush);
             #region fps
-            RenderTarget.DrawText(userinterface.message, userinterface.textFormat, userinterface.MessageTextBox, userinterface.blackBrush);
             RenderTarget.DrawText($"{(int)fps} fps", userinterface.textFormat, userinterface.fpsTextBox, userinterface.blackBrush);
             gameFrameCount++;
             ElapsedTime = (double)gameClock.ElapsedTicks / Stopwatch.Frequency;

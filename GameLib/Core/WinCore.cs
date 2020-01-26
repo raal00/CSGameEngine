@@ -34,7 +34,7 @@ namespace GameLib.Core
         public UI userinterface;
         public bool Debug = true;
         public bool EndGame;
-
+        public int MapSizeK = 4;
         public bool OnRealMatrix = false;
         public string MatrixPath;
         public byte[,] mapMatrix;
@@ -61,8 +61,8 @@ namespace GameLib.Core
 
             mainRenderForm.Width = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width;
             mainRenderForm.Height = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height;
-            MatrWidth = mainRenderForm.Width * 2;
-            MatrHeight = mainRenderForm.Height;
+            MatrWidth = mainRenderForm.Width * MapSizeK;
+            MatrHeight = mainRenderForm.Height * MapSizeK;
 
             mapMatrix = new byte[MatrHeight, MatrWidth];
             if (OnRealMatrix == true) MatrixPath.LoadMTRX(ref mapMatrix, MatrWidth, MatrHeight);

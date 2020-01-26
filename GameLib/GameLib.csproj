@@ -68,6 +68,7 @@
     <Compile Include="Controller\TextureHandler.cs" />
     <Compile Include="Core\ICore.cs" />
     <Compile Include="Core\WinCore.cs" />
+    <Compile Include="Enums\ObjTurn.cs" />
     <Compile Include="Enums\loading.cs" />
     <Compile Include="Enums\ObjConstructorTag.cs" />
     <Compile Include="Enums\Saving.cs" />

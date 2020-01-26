@@ -14,7 +14,13 @@ namespace GameLib.Models
         [XmlArray("WallsList"), XmlArrayItem(typeof(Barrier), ElementName = "Barrier")]
         public List<Barrier> WallsOnScene;
 
-        public Barrier Floor;
+        [XmlIgnore]
+        [NonSerialized]
+        public bool DeleteStatus = false;
+        [XmlIgnore]
+        [NonSerialized]
+        public IGameObject ForDeleting;
+
         public Barrier BackGround;
 
         public int LevelId { get; set; }
@@ -26,12 +32,6 @@ namespace GameLib.Models
             else if (constructorTag == ObjConstructorTag.Barrier)
                 WallsOnScene.Add((Barrier)gameObj);
         }
-        public void RemoveObject(IGameObject gameObj, ObjConstructorTag constructorTag) 
-        {
-            if (constructorTag == ObjConstructorTag.GameObj)
-                ObjectsOnScene.Remove((GameObject)gameObj);
-            else if (constructorTag == ObjConstructorTag.Barrier)
-                WallsOnScene.Remove((Barrier)gameObj);
-        }
+     
     }
 }

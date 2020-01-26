@@ -15,12 +15,13 @@ namespace GameLib.Models
         public SharpDX.Direct2D1.Bitmap[] AnimTextures;
         private readonly GameObject target;
 
-        private int number;
+        public event EventHandler OnAnimationEnd = delegate { };
+
         private int animCount;
         private object locker;
 
         public string AnimName;
-        public bool Ended;
+        public bool Stopped;
         public bool Loop;
 
         public Animation(string animPath, string animName,GameObject gameObject, WindowRenderTarget renderTarget)
@@ -28,7 +29,7 @@ namespace GameLib.Models
             Loop = true;
             target = gameObject;
             AnimName = animName;
-            Ended = false;
+            Stopped = false;
             locker = new object();
 
             DirectoryInfo dic = new DirectoryInfo(animPath);
@@ -40,19 +41,24 @@ namespace GameLib.Models
             {
                 AnimTextures[i] = loadTexture(renderTarget, textureFiles[i].FullName);
             }
-            target.Texture = AnimTextures[0];
+            //OnAnimationEnd = new EventHandler(null, null);
         }
-        
         public async Task PlayAsync(int time) => await Task.Run(()=> {
             do
             {
                 for (int i = 0; i < animCount; i++)
                 {
+                    if (Stopped) 
+                    {
+                        Loop = false;
+                        break;
+                    }
                     lock (locker) target.Texture = AnimTextures[i];
                     Task.Delay(time).Wait();
                 }
             }
             while (Loop);
+            OnAnimationEnd.Invoke(null, null);
         });
 
         private SharpDX.Direct2D1.Bitmap loadTexture(WindowRenderTarget target, string texturePath)
