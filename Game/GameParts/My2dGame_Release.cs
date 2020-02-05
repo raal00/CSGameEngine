@@ -2,6 +2,7 @@
 using GameLib.Core;
 using GameLib.Enums;
 using GameLib.Models;
+using GameLib.Params;
 using System;
 using System.Linq;
 
@@ -19,154 +20,112 @@ namespace Game
 
         private void MainRenderForm_KeyDown_release(object sender, System.Windows.Forms.KeyEventArgs e)
         {
-            bool free = true;
-            switch (e.KeyCode)
+            bool move = false;
+            if (!keys.ContainsKey(e.KeyCode))
             {
-                case System.Windows.Forms.Keys.Right:
-                    if (controlledHero.Collider.Right + controlledHero.Speed >= MatrWidth) break;
-                    for (int i = (int)controlledHero.Collider.Top + 10; i < (int)controlledHero.Collider.Bottom - 10; i++)
-                    { 
-                        if (mapMatrix[i, (int)(controlledHero.Collider.Right + controlledHero.Speed)] == 1) 
-                        {
-                            free = false;
-                            break;
-                        }
-                    }
-                    if (free)
-                    {
-                        Move.X = controlledHero.Speed;
-                        Move.Y = 0;
-                        
-                        if (!controlledHero.animationController.CurrentAnimName.Contains("Run"))
-                        {
-                            controlledHero.animationController.AnimationRun("Run_R", true, 200);
-                        }
-                        // move object
-                        controlledHero.Move(Move);
-                        // move camera
-                        if (true)
-                        {
-                            camMove.Y = 0;
-                            camMove.X = controlledHero.Speed;
-                            cam2d.MoveCamera(camMove);
-                            userinterface.SetUIPos();
-                            if (Debug == true) userinterface.SetUIPos_Debug();
-                            RenderTarget.Transform = cam2d.GetTransform3x2();
-                        }
-                    }
-                    break;
-                case System.Windows.Forms.Keys.Left:
-                    if (controlledHero.Collider.Left - controlledHero.Speed <= 0) break;
-                    for (int i = (int)controlledHero.Collider.Top + 10; i < (int)controlledHero.Collider.Bottom - 10; i++)
-                    {
-                        if (mapMatrix[i, (int)(controlledHero.Collider.Left - controlledHero.Speed)] == 1)
-                        {
-                            free = false;
-                            break;
-                        }
-                    }
-                    if (free)
-                    {
-                        Move.X = -controlledHero.Speed;
-                        Move.Y = 0;
-                        if (!controlledHero.animationController.CurrentAnimName.Contains("Run"))
-                        {
-                            controlledHero.animationController.AnimationRun("Run_R", true, 200);
-                        }
-                        // move object
-                        controlledHero.Move(Move);
-                        // move camera
-                        if (true)
-                        {
-                            camMove.Y = 0;
-                            camMove.X = -controlledHero.Speed;
-                            cam2d.MoveCamera(camMove);
-                            userinterface.SetUIPos();
-                            if (Debug == true) userinterface.SetUIPos_Debug();
-                            RenderTarget.Transform = cam2d.GetTransform3x2();
-                        }
-                    }
-                    break;
-                case System.Windows.Forms.Keys.Up:
-                    if (controlledHero.Collider.Top - controlledHero.Speed <= 0) break;
-                    for (int i = (int)controlledHero.Collider.Left + 10; i < (int)controlledHero.Collider.Right - 10; i++)
-                    {
-                        if (mapMatrix[(int)(controlledHero.Collider.Top + controlledHero.Speed), i] == 1)
-                        {
-                            free = false;
-                            break;
-                        }
-                    }
-                    if (free)
-                    {
-                        Move.Y = controlledHero.Speed;
-                        Move.X = 0;
-                        if (!controlledHero.animationController.CurrentAnimName.Contains("Run"))
-                        {
-                            controlledHero.animationController.AnimationRun("Run_R", true, 200);
-                        }
-                        // move object
-                        controlledHero.Move(Move);
-                        // move camera
-                        if (true)
-                        {
-                            camMove.Y = -controlledHero.Speed;
-                            camMove.X = 0;
-                            cam2d.MoveCamera(camMove);
-                            userinterface.SetUIPos();
-                            if (Debug == true) userinterface.SetUIPos_Debug();
-                            RenderTarget.Transform = cam2d.GetTransform3x2();
-                        }
-                    }
-                    break;
-                case System.Windows.Forms.Keys.Down:
-                    if (controlledHero.Collider.Top + controlledHero.Speed >= MatrHeight) break;
-                    for (int i = (int)controlledHero.Collider.Left + 10; i < (int)controlledHero.Collider.Right - 10; i++)
-                    {
-                        if (mapMatrix[(int)(controlledHero.Collider.Bottom - controlledHero.Speed), i] == 1)
-                        {
-                            free = false;
-                            break;
-                        }
-                    }
-                    if (free)
-                    {
-                        Move.Y = -controlledHero.Speed;
-                        Move.X = 0;
-                        if (!controlledHero.animationController.CurrentAnimName.Contains("Run"))
-                        {
-                            controlledHero.animationController.AnimationRun("Run_R", true, 200);
-                        }
-                        // Move object
-                        controlledHero.Move(Move);
-                        // Move camera
-                        if (true)
-                        {
-                            camMove.Y = controlledHero.Speed;
-                            camMove.X = 0;
-                            cam2d.MoveCamera(camMove);
-                            userinterface.SetUIPos();
-                            if (Debug == true) userinterface.SetUIPos_Debug();
-                            RenderTarget.Transform = cam2d.GetTransform3x2();
-                        }
-                    }
-                    break;
+                keys.Add(e.KeyCode, true);
+            }
+            else
+            {
+                keys[e.KeyCode] = true;
+            }
 
-                case System.Windows.Forms.Keys.E:
-                    
+
+            if (keys.ContainsKey(System.Windows.Forms.Keys.Up) && keys[System.Windows.Forms.Keys.Up] &&
+                keys.ContainsKey(System.Windows.Forms.Keys.Right) && keys[System.Windows.Forms.Keys.Right])
+            {
+                // Вперед + право
+                controlledHero.MoveVec.Y = controlledHero.Speed;
+                controlledHero.MoveVec.X = controlledHero.Speed;
+                move = true;
+            }
+            else if (keys.ContainsKey(System.Windows.Forms.Keys.Up) && keys[System.Windows.Forms.Keys.Up] &&
+                     keys.ContainsKey(System.Windows.Forms.Keys.Left) && keys[System.Windows.Forms.Keys.Left])
+            {
+                // Вперед + лево
+                controlledHero.MoveVec.Y = controlledHero.Speed;
+                controlledHero.MoveVec.X = -controlledHero.Speed;
+                move = true;
+            }
+            else if (keys.ContainsKey(System.Windows.Forms.Keys.Down) && keys[System.Windows.Forms.Keys.Down] &&
+                     keys.ContainsKey(System.Windows.Forms.Keys.Right) && keys[System.Windows.Forms.Keys.Right])
+            {
+                // Назад + право  
+                controlledHero.MoveVec.Y = -controlledHero.Speed;
+                controlledHero.MoveVec.X = controlledHero.Speed;
+                move = true;
+            }
+            else if (keys.ContainsKey(System.Windows.Forms.Keys.Down) && keys[System.Windows.Forms.Keys.Down] &&
+                     keys.ContainsKey(System.Windows.Forms.Keys.Left) && keys[System.Windows.Forms.Keys.Left])
+            {
+                // Назад + лево 
+                controlledHero.MoveVec.Y = -controlledHero.Speed;
+                controlledHero.MoveVec.X = -controlledHero.Speed;
+                move = true;
+            }
+            else if (keys.ContainsKey(System.Windows.Forms.Keys.Up) && keys[System.Windows.Forms.Keys.Up])
+            {
+                // Вперед
+                controlledHero.MoveVec.Y = controlledHero.Speed;
+                controlledHero.MoveVec.X = 0;
+                move = true;
+            }
+            else if (keys.ContainsKey(System.Windows.Forms.Keys.Down) && keys[System.Windows.Forms.Keys.Down])
+            {
+                // Назад
+                controlledHero.MoveVec.Y = -controlledHero.Speed;
+                controlledHero.MoveVec.X = 0;
+                move = true;
+            }
+            else if (keys.ContainsKey(System.Windows.Forms.Keys.Left) && keys[System.Windows.Forms.Keys.Left])
+            {
+                // Влево
+                controlledHero.MoveVec.X = -controlledHero.Speed;
+                controlledHero.MoveVec.Y = 0;
+                move = true;
+            }
+            else if (keys.ContainsKey(System.Windows.Forms.Keys.Right) && keys[System.Windows.Forms.Keys.Right])
+            {
+                // Вправо
+                controlledHero.MoveVec.X = controlledHero.Speed;
+                controlledHero.MoveVec.Y = 0;
+                move = true;
+            }
+            else
+            {
+                switch (e.KeyCode)
+                {
+                    case System.Windows.Forms.Keys.E:
                         controlledHero.animationController.AnimationRun("Kick_R", false, 200);
-                        IGameObject gobject = (from obj in Level.WallsOnScene where 
-                                           obj.Breakable == true &&
-                                             Math.Abs(obj.position.X - controlledHero.position.X) < 100 &&
-                                             Math.Abs(obj.position.Y - controlledHero.position.Y) < 400
-                                       select obj).FirstOrDefault();
-                    if (gobject != null) breakWall((Barrier)gobject);
-                    break;
+                        IGameObject gobject = (from obj in Level.WallsOnScene
+                                               where
+                                    obj.Breakable == true &&
+                                    Math.Abs(obj.position.X - controlledHero.position.X) < 100 &&
+                                    Math.Abs(obj.position.Y - controlledHero.position.Y) < 300
+                                               select obj).FirstOrDefault();
+                        if (gobject != null) breakWall((Barrier)gobject);
+                        break;
+                }
+                //
+            }
+            if (move)
+            {
+                controlledHero.Move(controlledHero.MoveVec);
+                MapValues.cam2d.camPos.X = controlledHero.position.X - mainRenderForm.Width / 3;
+                MapValues.cam2d.camPos.Y = controlledHero.position.Y - mainRenderForm.Height / 3;
+                userinterface.SetUIPos();
+                if (Debug == true) userinterface.SetUIPos_Debug();
+                RenderTarget.Transform = MapValues.cam2d.GetTransform3x2();
             }
         }
         private void MainRenderForm_KeyUp_release(object sender, System.Windows.Forms.KeyEventArgs e)
         {
-            if (controlledHero.animationController.PlayingAnimation.Loop == true) 
+            if (keys.ContainsKey(e.KeyCode)) 
+            {
+                keys[e.KeyCode] = false;
+            }
+            //if (controlledHero.animationController.PlayingAnimation.Loop == true) 
+            
             {
                 controlledHero.animationController.AnimationStop();
             }

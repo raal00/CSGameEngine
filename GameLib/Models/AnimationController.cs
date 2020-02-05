@@ -25,7 +25,7 @@ namespace GameLib.Models
             anims = new Animation[animsCount];
             for (int i = 0; i < animsCount; i++) 
             {
-                anims[i] = new Animation(controllerPath+"/"+ animDirs[i].Name+"/", animDirs[i].Name, target, renderTarget);
+                anims[i] = new Animation(controllerPath + "/"+ animDirs[i].Name+"/", animDirs[i].Name, target, renderTarget);
             }
             DefaultAnimation = anims.Where(x => x.AnimName == "Idle").FirstOrDefault();
             playDefaultAnimation();
@@ -48,7 +48,7 @@ namespace GameLib.Models
         }
         public async void AnimationRun(Animation animation, bool loop, int changeTime) 
         {
-            if (animation != null)
+            if (animation != null && PlayingAnimation == DefaultAnimation)
             {
                 PlayingAnimation = animation;
                 PlayingAnimation.Stopped = false;
@@ -61,8 +61,8 @@ namespace GameLib.Models
 
         private void OnAnimationEndAction(object sender, EventArgs e)
         {
-            playDefaultAnimation();
             IsAnimationCompleating = false;
+            AnimationStop();
         }
 
         private async void playDefaultAnimation() 
@@ -91,8 +91,6 @@ namespace GameLib.Models
             {
                 IsAnimationCompleating = false;
                 PlayingAnimation.Stopped = true;
-                PlayingAnimation = null;
-                CurrentAnimName = null;
                 playDefaultAnimation();
             }
         }

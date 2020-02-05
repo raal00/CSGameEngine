@@ -2,6 +2,7 @@
 using GameLib.Core;
 using GameLib.Enums;
 using GameLib.Models;
+using GameLib.Params;
 using GameLib.Transform;
 using System;
 using System.Linq;
@@ -18,8 +19,8 @@ namespace Game
 
         private void MainRenderForm_MouseClick_Debug(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            float x = e.Location.X + cam2d.camPos.X;
-            float y = e.Location.Y + cam2d.camPos.Y;
+            float x = e.Location.X + MapValues.cam2d.camPos.X;
+            float y = e.Location.Y + MapValues.cam2d.camPos.Y;
             IGameObject gameObject = null;
 
             if (e.Button == System.Windows.Forms.MouseButtons.Middle) 
@@ -95,13 +96,13 @@ namespace Game
                         {
                             for (float j = left; j < right; j++)
                             {
-                                mapMatrix[(int)i, (int)j] = 1;
+                                MapValues.mapMatrix[(int)i, (int)j] = 1;
                             }
                         }
                     }
                     (gameObject as Barrier).position = new Vector2((right-left)/2+left,(bot-top)/2+top);
                     (gameObject as Barrier).HideOnApproach = hideOnApproach;
-                    (gameObject as Barrier).visible = true;
+                    (gameObject as Barrier).visible = Visible;
                     (gameObject as Barrier).Breakable = breakable;
                     (gameObject as Barrier).objectTag = Tag.ENVIRONMENT;
                 }
@@ -139,37 +140,40 @@ namespace Game
                 case System.Windows.Forms.Keys.C:
                     hideOnApproach = !hideOnApproach;
                     break;
+                case System.Windows.Forms.Keys.V:
+                    Visible = !Visible;
+                    break;
                 case System.Windows.Forms.Keys.Left: // camera left
-                    camMove.Y = 0;
-                    camMove.X = -5;
-                    cam2d.MoveCamera(camMove);
+                    MapValues.camMove.Y = 0;
+                    MapValues.camMove.X = -5;
+                    MapValues.cam2d.MoveCamera(MapValues.camMove);
                     userinterface.SetUIPos();
                     if (Debug == true) userinterface.SetUIPos_Debug();
-                    RenderTarget.Transform = cam2d.GetTransform3x2();
+                    RenderTarget.Transform = MapValues.cam2d.GetTransform3x2();
                     break;
                 case System.Windows.Forms.Keys.Right: // camera rigth
-                    camMove.Y = 0;
-                    camMove.X = 5;
-                    cam2d.MoveCamera(camMove);
+                    MapValues.camMove.Y = 0;
+                    MapValues.camMove.X = 5;
+                    MapValues.cam2d.MoveCamera(MapValues.camMove);
                     userinterface.SetUIPos();
                     if (Debug == true) userinterface.SetUIPos_Debug();
-                    RenderTarget.Transform = cam2d.GetTransform3x2();
+                    RenderTarget.Transform = MapValues.cam2d.GetTransform3x2();
                     break;
                 case System.Windows.Forms.Keys.Up: // camera up
-                    camMove.Y = -5;
-                    camMove.X = 0;
-                    cam2d.MoveCamera(camMove);
+                    MapValues.camMove.Y = -5;
+                    MapValues.camMove.X = 0;
+                    MapValues.cam2d.MoveCamera(MapValues.camMove);
                     userinterface.SetUIPos();
                     if (Debug == true) userinterface.SetUIPos_Debug();
-                    RenderTarget.Transform = cam2d.GetTransform3x2();
+                    RenderTarget.Transform = MapValues.cam2d.GetTransform3x2();
                     break;
                 case System.Windows.Forms.Keys.Down: // camera down
-                    camMove.Y = 5;
-                    camMove.X = 0;
-                    cam2d.MoveCamera(camMove);
+                    MapValues.camMove.Y = 5;
+                    MapValues.camMove.X = 0;
+                    MapValues.cam2d.MoveCamera(MapValues.camMove);
                     userinterface.SetUIPos();
                     if (Debug == true) userinterface.SetUIPos_Debug();
-                    RenderTarget.Transform = cam2d.GetTransform3x2();
+                    RenderTarget.Transform = MapValues.cam2d.GetTransform3x2();
                     break;
                 default: break;
             }
@@ -177,12 +181,12 @@ namespace Game
         }
         private void MainRenderForm_MouseWheel_Debug(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            if ((e.Delta > 0 && cam2d.Zoom < 4f) || (e.Delta < 0 && cam2d.Zoom > 0.7f)) 
+            if ((e.Delta > 0 && MapValues.cam2d.Zoom < 4f) || (e.Delta < 0 && MapValues.cam2d.Zoom > 0.7f)) 
             {
-                cam2d.Zoom += e.Delta / 120;
+                MapValues.cam2d.Zoom += e.Delta / 120;
                 userinterface.SetUIPos();
                 if (Debug == true) userinterface.SetUIPos_Debug();
-                RenderTarget.Transform = cam2d.GetTransform3x2();
+                RenderTarget.Transform = MapValues.cam2d.GetTransform3x2();
             }
         }
     }

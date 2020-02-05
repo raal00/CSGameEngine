@@ -20,8 +20,9 @@ namespace GameLib.Models
         public RawRectangleF BuildParamsRect;
         #endregion
 
-        public string message = "This is test message" +
-            "Hello world";
+        public string GameMes   = "";
+        public string HeroesMes = "";
+
 
         // Colors
         public RawColor4 mainFormBackgroundColor;
@@ -73,7 +74,7 @@ namespace GameLib.Models
             fpsTextBox.Left = camera2.camPos.X;
             fpsTextBox.Right = camera2.camPos.X + 200;
 
-            if (message != null)
+            if (GameMes != null)
             {
                 MessageTextBox.Top = camera2.camPos.Y + 5;
                 MessageTextBox.Bottom = camera2.camPos.Y + 105;
@@ -95,7 +96,7 @@ namespace GameLib.Models
         }
         public void SetMessageText(string mes = null) 
         {
-            message = mes;
+            GameMes = mes;
         }
     }
 }

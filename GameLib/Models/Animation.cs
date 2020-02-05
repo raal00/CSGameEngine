@@ -58,7 +58,10 @@ namespace GameLib.Models
                 }
             }
             while (Loop);
-            OnAnimationEnd.Invoke(null, null);
+            if (!Stopped)
+            {
+                OnAnimationEnd.Invoke(null, null);
+            }
         });
 
         private SharpDX.Direct2D1.Bitmap loadTexture(WindowRenderTarget target, string texturePath)

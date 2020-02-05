@@ -7,6 +7,8 @@ using GameLib.Models;
 using GameLib;
 using GameLib.Enums;
 using GameLib.Interaction;
+using GameLib.Params;
+
 namespace GameLib
 {
     public class Win_GameApi : IGameApi
@@ -44,8 +46,8 @@ namespace GameLib
                     serializer.Serialize(fileStream, core.Level);
                     // show message
                 }
-                core.mapMatrix.SaveMTRX(core.MatrWidth, core.MatrHeight, Strings.SavePath + "matrix" + SaveId + ".txt");
-                Console.WriteLine($"Матрица {core.MatrWidth}x{core.MatrHeight} уровня сохранена");
+                MapValues.mapMatrix.SaveMTRX(MapValues.MatrWidth, MapValues.MatrHeight, Strings.SavePath + "matrix" + SaveId + ".txt");
+                Console.WriteLine($"Матрица {MapValues.MatrWidth}x{MapValues.MatrHeight} уровня сохранена");
             }
         }
 
@@ -62,8 +64,8 @@ namespace GameLib
                 {
                     serializer.Serialize(fileStream, core.Level);
                 }
-                core.mapMatrix.SaveMTRX(core.MatrWidth, core.MatrHeight, Strings.LevelsPath + "matrix" + levelId + ".txt");
-                Console.WriteLine($"Матрица {core.MatrWidth}x{core.MatrHeight} уровня сохранена");
+                MapValues.mapMatrix.SaveMTRX(MapValues.MatrWidth, MapValues.MatrHeight, Strings.LevelsPath + "matrix" + levelId + ".txt");
+                Console.WriteLine($"Матрица {MapValues.MatrWidth}x{MapValues.MatrHeight} уровня сохранена");
             }
         }
 
@@ -124,7 +126,7 @@ namespace GameLib
             core.initForm(formName);
             core.Debug = GenLvl;
             core.InitObjects();
-            Console.WriteLine($"Матрица уровня {core.MatrWidth}x{core.MatrHeight}");
+            Console.WriteLine($"Матрица уровня {MapValues.MatrWidth}x{MapValues.MatrHeight}");
             core.InitBinds();
             core.ShowForm();
         }

@@ -9,6 +9,7 @@ using SharpDX.DXGI;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using SharpDX.Windows;
+using GameLib.Params;
 
 namespace GameLib.Core
 {
@@ -18,7 +19,6 @@ namespace GameLib.Core
         public WindowRenderTarget RenderTarget = null;  // 
         protected SharpDX.Direct2D1.Factory Factory = null; //
         protected RenderLoop.RenderCallback callback;
-        protected Camera2D cam2d = new Camera2D(0, 0);
 
         protected double fps = 0;
         protected Stopwatch gameClock;
@@ -37,9 +37,6 @@ namespace GameLib.Core
         public int MapSizeK = 4;
         public bool OnRealMatrix = false;
         public string MatrixPath;
-        public byte[,] mapMatrix;
-        public int MatrWidth;
-        public int MatrHeight;
 
         public WinCore() 
         {
@@ -61,11 +58,11 @@ namespace GameLib.Core
 
             mainRenderForm.Width = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width;
             mainRenderForm.Height = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height;
-            MatrWidth = mainRenderForm.Width * MapSizeK;
-            MatrHeight = mainRenderForm.Height * MapSizeK;
+            MapValues.MatrWidth = mainRenderForm.Width * MapSizeK;
+            MapValues.MatrHeight = mainRenderForm.Height * MapSizeK;
 
-            mapMatrix = new byte[MatrHeight, MatrWidth];
-            if (OnRealMatrix == true) MatrixPath.LoadMTRX(ref mapMatrix, MatrWidth, MatrHeight);
+            MapValues.mapMatrix = new byte[MapValues.MatrHeight, MapValues.MatrWidth];
+            if (OnRealMatrix == true) MatrixPath.LoadMTRX(ref MapValues.mapMatrix, MapValues.MatrWidth, MapValues.MatrHeight);
             mainRenderForm.ShowIcon = false;
             gameClock = Stopwatch.StartNew();
 

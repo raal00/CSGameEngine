@@ -5,7 +5,7 @@ namespace GameLib.Models
 {
     public class Camera2D
     {
-        float Rotation = 0;
+        public float Rotation = 0;
         public Vector2 camPos = new Vector2(0,0);
 
         public float Zoom = 1;
@@ -27,7 +27,7 @@ namespace GameLib.Models
                 return Matrix3x2.Translation(-camPos.X, -camPos.Y) *
                        Matrix3x2.Rotation(Rotation) *
                        Matrix3x2.Scaling(Zoom) *
-                       Matrix3x2.Translation(ViewportCenter); ;
+                       Matrix3x2.Translation(ViewportCenter);
             }
         }
 

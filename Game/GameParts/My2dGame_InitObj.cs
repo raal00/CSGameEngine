@@ -3,6 +3,7 @@ using GameLib.Controller;
 using GameLib.Core;
 using GameLib.Enums;
 using GameLib.Models;
+using GameLib.Params;
 using SharpDX.Direct2D1;
 using SharpDX.WIC;
 using System;
@@ -20,11 +21,11 @@ namespace Game
         public override void InitObjects()
         {
             // set camera
-            RenderTarget.Transform = cam2d.GetTransform3x2();
-            camMove = new SharpDX.Vector2(200, 200);
-
+            MapValues.cam2d = new Camera2D(0, 0);
+            RenderTarget.Transform = MapValues.cam2d.GetTransform3x2();
+            MapValues.camMove = new SharpDX.Vector2(200, 200);
             // set UI
-            if (userinterface == null) userinterface = new UI(RenderTarget, cam2d);
+            if (userinterface == null) userinterface = new UI(RenderTarget, MapValues.cam2d);
             //mainRenderForm.Menu = new System.Windows.Forms.MainMenu();
             //mainRenderForm.Menu.MenuItems.Add("Exit").Click += OnMenuExitClick;
             //mainRenderForm.Menu.MenuItems.Add("Pause").Click += OnMenuPauseClick;
@@ -52,7 +53,7 @@ namespace Game
 
                 Level.BackGround = background;
                 Level.ObjectsOnScene.Add(player1);
-                cam2d.MoveCamera(new SharpDX.Vector2(mainRenderForm.Width, mainRenderForm.Height));
+                MapValues.cam2d.MoveCamera(new SharpDX.Vector2(mainRenderForm.Width, mainRenderForm.Height));
                 controlledHero = player1;
 
                 DirectoryInfo dic = new DirectoryInfo(Strings.BuildWallsPath);
@@ -71,7 +72,7 @@ namespace Game
             {
                 #region Release init part
                 statusGame = StatusGame.Release;
-                cam2d.Zoom = 1.5f;
+                MapValues.cam2d.Zoom = 1.5f;
                 foreach (var obj in Level.ObjectsOnScene)
                 {
                     obj.SetTexture(RenderTarget);
@@ -84,8 +85,8 @@ namespace Game
                     controlledHero.Move(new GameLib.Transform.Vector2(200, -200));
                     controlledHero.SetTexture(RenderTarget);
                 }
-                cam2d.MoveCamera(camMove);
-                RenderTarget.Transform = cam2d.GetTransform3x2();
+                MapValues.cam2d.MoveCamera(MapValues.camMove);
+                RenderTarget.Transform = MapValues.cam2d.GetTransform3x2();
                 controlledHero.animationController = new AnimationController(Strings.AnimationControllerPath + "Hero/", controlledHero, RenderTarget);
 
                 foreach (var obj in Level.WallsOnScene)

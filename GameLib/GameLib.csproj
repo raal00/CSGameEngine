@@ -65,6 +65,9 @@
     <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI\EnemyAI.cs" />
+    <Compile Include="AI\FriendsAI.cs" />
+    <Compile Include="AI\IAI.cs" />
     <Compile Include="Controller\TextureHandler.cs" />
     <Compile Include="Core\ICore.cs" />
     <Compile Include="Core\WinCore.cs" />
@@ -88,6 +91,7 @@
     <Compile Include="Models\Phisics.cs" />
     <Compile Include="Models\Size.cs" />
     <Compile Include="Models\UI.cs" />
+    <Compile Include="Params\MapValues.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Strings.cs" />

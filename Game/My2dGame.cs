@@ -9,37 +9,34 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using SharpDX.Direct2D1;
+using System.Windows.Forms;
+using GameLib.Params;
 
 namespace Game
 {
     public sealed partial class My2dGame : WinCore, IObserverable
     {
-        /*
-         0000000000000000000
-         0000011110000000000
-         1111111111111100011    
-             */
-        private StatusGame statusGame;
-        private ObjConstructorTag objConstructorTag;
+        private StatusGame statusGame; // debug/release
+        private ObjConstructorTag objConstructorTag; // add character/ add object
         private List<IObserver> observers;
+        private Dictionary<Keys, bool> keys; // dict of pressed keys
 
         #region DEBUG
-        Size oSize = new Size(128, 128);
-        Bitmap[] buildTextures;
-        string[] buildTextures_Names;
-        int numberOfWallTexture = 0;
+        Size CharacterSize = new Size(100, 100); // размер добаляемых персонажей
+        Bitmap[] buildTextures;         // текстуры для объектов
+        string[] buildTextures_Names;   // пути к файлам текстур
+        int numberOfWallTexture = 0;    // номер тек. текстуры
    
         GameObject player1;
         Barrier background;
-        bool breakable = false;
-        bool hideOnApproach = false;
-        bool hasPhisCollider = true;
-        string BuildParamString;
+        bool breakable = false;      // флаг разрушаемости объекта
+        bool hideOnApproach = false; // флаг сокрытия объекта при сближении
+        bool hasPhisCollider = true; // флаг существования физ. оболочки
+        bool Visible = true;         // флаг видимости объекта
+        string BuildParamString;     // Вывод состояний флагов
         #endregion
 
-        Vector2 Move = new Vector2(0,0);
-
-        SharpDX.Vector2 camMove;
+         // вектор движения героя
         GameObject controlledHero;
 
 
@@ -47,6 +44,7 @@ namespace Game
         {
             EndGame = false;
             observers = new List<IObserver>();
+            keys = new Dictionary<Keys, bool>();
         }
 
         private void OnMenuPauseClick(object sender, EventArgs e)
@@ -83,15 +81,15 @@ namespace Game
 
             userinterface.SetUIPos();
             if (Debug == true) userinterface.SetUIPos_Debug();
-            RenderTarget.Transform = cam2d.GetTransform3x2();
+            RenderTarget.Transform = MapValues.cam2d.GetTransform3x2();
         }
 
         private void MainRenderForm_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (GetStartPos == true) 
             {
-                userinterface.BuildRect.Right = e.Location.X + cam2d.camPos.X;
-                userinterface.BuildRect.Bottom = e.Location.Y + cam2d.camPos.Y;
+                userinterface.BuildRect.Right = e.Location.X + MapValues.cam2d.camPos.X;
+                userinterface.BuildRect.Bottom = e.Location.Y + MapValues.cam2d.camPos.Y;
             }
         }
         void breakWall(Barrier barrier) 
@@ -102,7 +100,7 @@ namespace Game
             {
                 for (int j = (int)barrier.Collider.Left; j < (int)barrier.Collider.Right; j++) 
                 {
-                    mapMatrix[i, j] = 0;
+                    MapValues.mapMatrix[i, j] = 0;
                 }
             }
         }
@@ -138,8 +136,25 @@ namespace Game
             // draw walls
             foreach (var obj in Level.WallsOnScene)
             {
+                if (obj.HideOnApproach == true)
+                {
+                    // NEED TO OPTIMIZING
+                    if ((obj.Collider.Left < controlledHero.Collider.Left) &&
+                        (obj.Collider.Right > controlledHero.Collider.Right) &&
+                        (obj.Collider.Top < controlledHero.Collider.Top) &&
+                        (obj.Collider.Bottom > controlledHero.Collider.Bottom))
+                    {
+                        obj.visible = false;
+                    }
+                    else 
+                    {
+                        obj.visible = true;
+                    }
+                }
                 if (obj.visible == true)
-                RenderTarget.DrawBitmap(obj.Texture, obj.Collider, 1, SharpDX.Direct2D1.BitmapInterpolationMode.NearestNeighbor);
+                {   
+                    RenderTarget.DrawBitmap(obj.Texture, obj.Collider, 1, SharpDX.Direct2D1.BitmapInterpolationMode.NearestNeighbor);
+                }
             }
 
             if (statusGame == StatusGame.Debug)
@@ -151,17 +166,16 @@ namespace Game
                 if (buildTextures.Length > 0)
                 {
                     RenderTarget.DrawBitmap(buildTextures[numberOfWallTexture], userinterface.BuildTextureRect, 1, BitmapInterpolationMode.NearestNeighbor);
-                    if (breakable) BuildParamString = "Разбиваемый";
-                    else BuildParamString = "Не разбиваемый";
-                    if (hideOnApproach) BuildParamString += "\nСкрыть при приближении";
-                    else BuildParamString += "\nНе скрывать";
-                    if (hasPhisCollider) BuildParamString += "\nС физ. оболочкой";
-                    else BuildParamString += "\nБез физ. оболочки";
+                    // NEED TO OPTIMIZING
+                    BuildParamString = $"Разбиваемый: {breakable}\n" +
+                                       $"Скрыть при приближении: {hideOnApproach}\n" +
+                                       $"С физ. оболочкой: {hasPhisCollider}\n" +
+                                       $"Видимый: {Visible}";
                     RenderTarget.DrawText(BuildParamString, userinterface.textFormat, userinterface.BuildParamsRect, userinterface.redBrush);
                 }
             }
             
-            RenderTarget.DrawText(userinterface.message, userinterface.textFormat, userinterface.MessageTextBox, userinterface.redBrush);
+            RenderTarget.DrawText(userinterface.GameMes, userinterface.textFormat, userinterface.MessageTextBox, userinterface.redBrush);
             #region fps
             RenderTarget.DrawText($"{(int)fps} fps", userinterface.textFormat, userinterface.fpsTextBox, userinterface.blackBrush);
             gameFrameCount++;
